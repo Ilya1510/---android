@@ -1,5 +1,6 @@
 package com.example.ilya.firsthomework;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -78,18 +79,25 @@ public class SimpleFragment extends Fragment {
 
         final Button buttonSave = (Button) l.findViewById(R.id.button_save);
         buttonSave.setActivated(false);
+        final EditText textEditFirstName = (EditText) l.findViewById(R.id.edit_text_first_name);
+        final EditText textEditSecondName = (EditText) l.findViewById(R.id.edit_text_second_name);
         buttonSave.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 if (buttonSave.isActivated()) {
-                    buttonSave.setTextColor(1000);
+                    Intent intent = new Intent(getActivity(), ViewInfoActivity.class);
+                    intent.putExtra("first_name", textEditFirstName.getText());
+                    intent.putExtra("date_string", textViewChooseDate.getText());
+                    intent.putExtra("second_name", textEditSecondName.getText());
+                    System.out.println("!!! send " + getActivity() + " " + textEditFirstName.getText() + " " + textEditSecondName.getText() + " " +
+                        textViewChooseDate.getText());
+                    getActivity().startActivity(intent);
                 }
             }
         });
 
-        final EditText textEditFirstName = (EditText) l.findViewById(R.id.edit_text_first_name);
-        final EditText textEditSecondName = (EditText) l.findViewById(R.id.edit_text_second_name);
+
         final TextWatcherChangedTwo textWatcherChanged = new TextWatcherChangedTwo(buttonSave, textViewChooseDate);
         textEditFirstName.addTextChangedListener(textWatcherChanged);
         textEditSecondName.addTextChangedListener(textWatcherChanged);

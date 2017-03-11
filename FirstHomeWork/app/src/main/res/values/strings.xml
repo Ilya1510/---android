@@ -3,4 +3,5 @@
     <string name="show_dialog">Enter!</string>
     <string name="choose_data">choose data</string>
     <string name="text_save">Save</string>
+    <string name="button_edit_text">Edit</string>
 </resources>
