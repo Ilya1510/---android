@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,28 +16,19 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import static android.R.attr.button;
-import static android.R.attr.dependency;
-
 /**
  * Created by ilya on 08.03.17.
  */
 public class SimpleFragment extends Fragment {
     public static final String TAG = SimpleFragment.class.getSimpleName();
+    private Button mSave;
+    private EditText mFirstName;
+    private EditText mSecondName;
+    private TextView mTextViewChooseDate;
 
     //very big kostil((
-    public class TextWatcherChangedTwo implements TextWatcher {
-        Editable[] texts;
-        boolean[] exists;
-        boolean[] isNotEmpty;
-        Button dependButton;
-        TextView textDate;
-        TextWatcherChangedTwo(Button button, TextView date) {
-            texts = new Editable[2];
-            exists = new boolean[2];
-            isNotEmpty = new boolean[2];
-            dependButton = button;
-            textDate = date;
+    class TextWatcherChangedTwo implements TextWatcher {
+        TextWatcherChangedTwo() {
         }
 
         @Override
@@ -51,23 +43,12 @@ public class SimpleFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable s) {
-            if (!exists[0]) {
-                exists[0] = true;
-                isNotEmpty[0] = s.length() != 0;
-                texts[0] = s;
-            } else if (texts[0] != s) {
-                exists[1] = true;
-                isNotEmpty[1] = s.length() != 0;
-                texts[1] = s;
-            } else {
-                isNotEmpty[0] = s.length() != 0;
-            }
-            if (exists[0] && exists[1] && !textDate.getText().equals("choose data")) { // I couldnt else
-                System.out.println(textDate.getText());
-                dependButton.setActivated(true);
-            } else {
-                dependButton.setActivated(false);
-            }
+            final boolean firstEmpty = TextUtils.isEmpty(mFirstName.getText().toString());
+            final boolean secondEmpty = TextUtils.isEmpty(mSecondName.getText().toString());
+            final boolean dateEmpty = TextUtils.isEmpty(mTextViewChooseDate.getText()) ||
+                    mTextViewChooseDate.getText().equals(getString(R.string.choose_data));
+
+            mSave.setEnabled(!firstEmpty && !secondEmpty && !dateEmpty);
         }
     }
 
@@ -75,37 +56,36 @@ public class SimpleFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final LinearLayout l = (LinearLayout)inflater.inflate(R.layout.simple_fragment, container, false);
-        final TextView textViewChooseDate = (TextView) l.findViewById(R.id.show_dialog_choose_date);
+        mTextViewChooseDate = (TextView) l.findViewById(R.id.show_dialog_choose_date);
 
-        final Button buttonSave = (Button) l.findViewById(R.id.button_save);
-        buttonSave.setActivated(false);
-        final EditText textEditFirstName = (EditText) l.findViewById(R.id.edit_text_first_name);
-        final EditText textEditSecondName = (EditText) l.findViewById(R.id.edit_text_second_name);
-        buttonSave.setOnClickListener(new View.OnClickListener() {
+        mSave = (Button) l.findViewById(R.id.button_save);
+        mSave.setEnabled(false);
+        mFirstName = (EditText) l.findViewById(R.id.edit_text_first_name);
+        mSecondName = (EditText) l.findViewById(R.id.edit_text_second_name);
+        mSave.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                if (buttonSave.isActivated()) {
-                    Intent intent = new Intent(getActivity(), ViewInfoActivity.class);
-                    intent.putExtra("first_name", textEditFirstName.getText());
-                    intent.putExtra("date_string", textViewChooseDate.getText());
-                    intent.putExtra("second_name", textEditSecondName.getText());
-                    System.out.println("!!! send " + getActivity() + " " + textEditFirstName.getText() + " " + textEditSecondName.getText() + " " +
-                        textViewChooseDate.getText());
-                    getActivity().startActivity(intent);
-                }
+            Intent intent = new Intent(getActivity(), ViewInfoActivity.class);
+            intent.putExtra("first_name", mFirstName.getText().toString());
+            intent.putExtra("date_string", mTextViewChooseDate.getText());
+            intent.putExtra("second_name", mSecondName.getText().toString());
+            System.out.println("!!! send " + getActivity() + " " + mFirstName.getText() + " " + mSecondName.getText() + " " +
+                    mTextViewChooseDate.getText());
+            getActivity().startActivity(intent);
             }
         });
 
 
-        final TextWatcherChangedTwo textWatcherChanged = new TextWatcherChangedTwo(buttonSave, textViewChooseDate);
-        textEditFirstName.addTextChangedListener(textWatcherChanged);
-        textEditSecondName.addTextChangedListener(textWatcherChanged);
+        final TextWatcherChangedTwo textWatcherChanged = new TextWatcherChangedTwo();
+        mFirstName.addTextChangedListener(textWatcherChanged);
+        mSecondName.addTextChangedListener(textWatcherChanged);
+        mTextViewChooseDate.addTextChangedListener(textWatcherChanged);
 
-        textViewChooseDate.setOnClickListener(new View.OnClickListener() {
+        mTextViewChooseDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogFragment newFragment = new DateDialogFragment(textViewChooseDate, textWatcherChanged, buttonSave);
+                DialogFragment newFragment = new DateDialogFragment();
                 newFragment.show(getActivity().getSupportFragmentManager(), "DatePicker");
             }
         });

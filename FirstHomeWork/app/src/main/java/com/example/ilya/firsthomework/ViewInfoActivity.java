@@ -37,8 +37,9 @@ public class ViewInfoActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(this, MainActivity.class); why is doesn't work?
-                //startActivity(intent);
+            //Here you need to fill intent with data
+            Intent intent = new Intent(ViewInfoActivity.this, MainActivity.class);
+            startActivity(intent);
             }
         });
     }

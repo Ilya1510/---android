@@ -21,17 +21,9 @@ import java.util.Calendar;
  */
 public class DateDialogFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
     public static final String TAG = DateDialogFragment.class.getSimpleName();
-    private TextView PARENT;
-    private SimpleFragment.TextWatcherChangedTwo textWatcher;
-    private Button dependButton;
 
-    public DateDialogFragment(TextView parent,
-                              SimpleFragment.TextWatcherChangedTwo textWatcherChangedTwo,
-                              Button button) {
+    public DateDialogFragment() {
         super();
-        PARENT = parent;
-        dependButton = button;
-        textWatcher = textWatcherChangedTwo;
     }
 
     @NonNull
@@ -41,16 +33,13 @@ public class DateDialogFragment extends DialogFragment implements DatePickerDial
         int day = datePicker.getDayOfMonth();
         int month = datePicker.getMonth();
         int year = datePicker.getYear();
+
         return new DatePickerDialog(getActivity(), this, year, month, day);
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        PARENT.setText(dayOfMonth + "." + month + "." + year);
-        if (textWatcher.isNotEmpty[0] && textWatcher.isNotEmpty[1]) {
-            dependButton.setActivated(true);
-        } else {
-            dependButton.setActivated(false);
-        }
+        TextView textView = (TextView) getActivity().findViewById(R.id.show_dialog_choose_date);
+        textView.setText(dayOfMonth+"."+month+"."+year);
     }
 }
